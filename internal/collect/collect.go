@@ -3,6 +3,7 @@ package collect
 import (
 	"bufio"
 	"fmt"
+	"github.com/xjh-creator/reptile/internal/proxy"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -46,6 +47,7 @@ func (BaseFetch) Get(url string) ([]byte, error) {
 
 type BrowserFetch struct {
 	Timeout time.Duration
+	Proxy   proxy.ProxyFunc
 }
 
 //模拟浏览器访问
@@ -57,6 +59,12 @@ type BrowserFetch struct {
 func (b BrowserFetch) Get(url string) ([]byte, error) {
 	client := &http.Client{
 		Timeout: b.Timeout,
+	}
+
+	if b.Proxy != nil {
+		transport := http.DefaultTransport.(*http.Transport)
+		transport.Proxy = b.Proxy
+		client.Transport = transport
 	}
 
 	req, err := http.NewRequest("GET", url, nil)

@@ -1,6 +1,5 @@
-## feat:reptile a site and solve encoding
-1. 简单爬取澎湃新闻页面
-2. 进行字符编码处理
+## feat:add proxy
+1. 添加代理
 
 ## feat:add take up an engine
 之前将爬取网站信息的代码封装为了 fetch 函数，完成了第一轮的功能抽象。
@@ -8,3 +7,11 @@
 例如后面会讲到的模拟浏览器访问、代理访问等。需要切换爬取方法，用模块化的方式对功能进行组合、测试，
 需要对爬取网站数据的代码模块进行接口抽象。
 1. 添加采取引擎
+
+## feat:reptile a site and solve encoding
+1. 简单爬取澎湃新闻页面
+2. 进行字符编码处理
+
+
+
+
