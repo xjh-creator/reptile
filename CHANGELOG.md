@@ -1,3 +1,6 @@
+## feat:add option design model
+1. 用函数式选项模式改造调度引擎的初始化配置
+
 ## feat:add engine
 调度引擎主要目标是完成下面几个功能：
 1. 创建调度程序，接收任务并将任务存储起来；
