@@ -1,3 +1,7 @@
+## feat:add bfs and cookie
+1. 用广度优先搜索实战爬虫
+2. 用 Cookie 突破反爬封锁
+
 ## feat:add zap log
 1. 添加日志
 

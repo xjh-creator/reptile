@@ -18,14 +18,14 @@ import (
 */
 
 type Fetcher interface {
-	Get(url string) ([]byte, error)
+	Get(req *Request) ([]byte, error)
 }
 
 type BaseFetch struct {
 }
 
-func (BaseFetch) Get(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+func (BaseFetch) Get(r *Request) ([]byte, error) {
+	resp, err := http.Get(r.Url)
 
 	if err != nil {
 		fmt.Println(err)
@@ -56,7 +56,7 @@ type BrowserFetch struct {
 //等抓包工具查看数据包，会看到浏览器自动在 HTTP Header 中设置了很多内容，
 //其中比较重要的一个就是 User-Agent 字段，它可以表明当前正在使用的应用程序、
 //设备类型和操作系统的类型与版本。
-func (b BrowserFetch) Get(url string) ([]byte, error) {
+func (b BrowserFetch) Get(r *Request) ([]byte, error) {
 	client := &http.Client{
 		Timeout: b.Timeout,
 	}
@@ -67,7 +67,7 @@ func (b BrowserFetch) Get(url string) ([]byte, error) {
 		client.Transport = transport
 	}
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", r.Url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get url failed:%v", err)
 	}
