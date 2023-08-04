@@ -5,3 +5,4 @@ main
 *.out
 *.test
 testdata
+log

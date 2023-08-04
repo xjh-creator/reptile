@@ -1,3 +1,6 @@
+## feat:add zap log
+1. 添加日志
+
 ## feat:add proxy
 1. 添加代理
 
