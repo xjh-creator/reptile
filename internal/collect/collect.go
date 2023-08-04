@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/xjh-creator/reptile/internal/proxy"
+	"go.uber.org/zap"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -48,6 +49,7 @@ func (BaseFetch) Get(r *Request) ([]byte, error) {
 type BrowserFetch struct {
 	Timeout time.Duration
 	Proxy   proxy.ProxyFunc
+	Logger  *zap.Logger
 }
 
 //模拟浏览器访问
@@ -72,10 +74,16 @@ func (b BrowserFetch) Get(r *Request) ([]byte, error) {
 		return nil, fmt.Errorf("get url failed:%v", err)
 	}
 
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36")
-
+	if len(r.Cookie) > 0 {
+		req.Header.Set("Cookie", r.Cookie)
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36")
 	resp, err := client.Do(req)
+	time.Sleep(r.WaitTime)
 	if err != nil {
+		b.Logger.Error("fetch failed",
+			zap.Error(err),
+		)
 		return nil, err
 	}
 
