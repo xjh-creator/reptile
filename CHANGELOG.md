@@ -1,3 +1,8 @@
+## feat:add random user-agent
+1. 设置随机 User-Agent
+2. 为了避免服务器检测到我们使用了同一个 User-Agent，继而判断出是同一个客户端在发出请求
+3. 操作的本质就是将浏览器的不同型号与不同版本拼接起来，组成一个新的 User-Agent
+
 ## feat:add priority setting in request
 1. 爬虫任务的优先级有时并不是相同的，一些任务需要优先处理
 
