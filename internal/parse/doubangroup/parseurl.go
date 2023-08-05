@@ -19,8 +19,11 @@ func ParseURL(contents []byte, req *collect.Request) collect.ParseResult {
 		u := string(m[1])
 		result.Requests = append(
 			result.Requests, &collect.Request{
-				Url:    u,
-				Cookie: req.Cookie,
+				Url:      u,
+				WaitTime: req.WaitTime,
+				Cookie:   req.Cookie,
+				Depth:    req.Depth + 1,
+				MaxDepth: req.MaxDepth,
 				ParseFunc: func(c []byte, request *collect.Request) collect.ParseResult {
 					return GetContent(c, u)
 				},
@@ -30,7 +33,7 @@ func ParseURL(contents []byte, req *collect.Request) collect.ParseResult {
 	return result
 }
 
-const ContentRe = `<div class="topic-content">[\s\S]*?阳台[\s\S]*?<div`
+const ContentRe = `<div class="topic-content[\s\S]*?阳台[\s\S]*?</div`
 
 // GetContent 发现正文中有对应的文字，就将当前帖子的 URL 写入到 Items 当中
 func GetContent(contents []byte, url string) collect.ParseResult {

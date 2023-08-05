@@ -1,3 +1,6 @@
+## feat:add max depth limit
+1. 设置爬虫的最大深度
+
 ## feat:add option design model
 1. 用函数式选项模式改造调度引擎的初始化配置
 
