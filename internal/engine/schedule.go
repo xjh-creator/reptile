@@ -8,6 +8,7 @@ import (
 
 func init() {
 	Store.Add(doubangroup.Task)
+	Store.AddJSTask(doubangroup.DoubangroupJSTask)
 }
 
 func (c *CrawlerStore) Add(task *collect.Task) {

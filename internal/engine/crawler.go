@@ -45,7 +45,13 @@ func (c *Crawler) Schedule() {
 	for _, seed := range c.Seeds {
 		task := Store.hash[seed.Name]
 		task.Fetcher = seed.Fetcher
-		rootReqs := task.Rule.Root()
+		rootReqs, err := task.Rule.Root()
+		if err != nil {
+			c.Logger.Error("get root failed",
+				zap.Error(err),
+			)
+			continue
+		}
 		for _, req := range rootReqs {
 			req.Task = task
 		}
@@ -93,13 +99,22 @@ func (c *Crawler) CreateWork() {
 			c.SetFailure(req)
 			continue
 		}
-		rule := req.Task.Rule.Trunk[req.RuleName]
 
-		result := rule.ParseFunc(&collect.Context{
+		//获取当前任务对应的规则
+		rule := req.Task.Rule.Trunk[req.RuleName]
+		// 内容解析
+		result,err := rule.ParseFunc(&collect.Context{
 			Body: body,
 			Req: req,
 		})
-
+		if err != nil {
+			c.Logger.Error("ParseFunc failed ",
+				zap.Error(err),
+				zap.String("url", req.Url),
+			)
+			continue
+		}
+		// 新的任务加入队列中
 		if len(result.Requests) > 0 {
 			go c.scheduler.Push(result.Requests...)
 		}

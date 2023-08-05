@@ -1,3 +1,8 @@
+##  feat:add parse js
+1. 动态规则引擎
+2. 实现动态规则的引擎，可 Javascript 虚拟机，因为使用 JS 操作网页有天然的优势
+3. otto 是用 Go 编写的 JavaScript 虚拟机 https://github.com/robertkrimen/otto
+
 ## feat:design task and rules
 1. 一个爬虫任务会针对不同的网站有不同的处理规则，但现在的处理方式导致多个规则之间是割裂的，不便于统一管理。
 2. 我们在添加初始爬虫网站 URL 时，这些种子任务是在 main 函数中注入进去的，与任务的规则之间是割裂的。但是我们需要将初始爬虫 URL 与处理规则进行统一的管理。
