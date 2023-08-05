@@ -43,9 +43,13 @@ func (c *Crawler) Run() {
 func (c *Crawler) Schedule() {
 	var reqs []*collect.Request
 	for _, seed := range c.Seeds {
-		seed.RootReq.Task = seed
-		seed.RootReq.Url = seed.Url
-		reqs = append(reqs, seed.RootReq)
+		task := Store.hash[seed.Name]
+		task.Fetcher = seed.Fetcher
+		rootReqs := task.Rule.Root()
+		for _, req := range rootReqs {
+			req.Task = task
+		}
+		reqs = append(reqs, rootReqs...)
 	}
 
 	go c.scheduler.Schedule()
@@ -54,8 +58,8 @@ func (c *Crawler) Schedule() {
 
 func (c *Crawler) CreateWork() {
 	for {
-		r := c.scheduler.Pull()
-		if err := r.Check(); err != nil {
+		req := c.scheduler.Pull()
+		if err := req.Check(); err != nil {
 			c.Logger.Error("check failed",
 				zap.Error(err),
 			)
@@ -63,33 +67,38 @@ func (c *Crawler) CreateWork() {
 		}
 
 		// 判断当前请求是否已被访问
-		if !r.Task.Reload && c.HasVisited(r) {
+		if !req.Task.Reload && c.HasVisited(req) {
 			c.Logger.Debug("request has visited",
-				zap.String("url:", r.Url),
+				zap.String("url:", req.Url),
 			)
 			continue
 		}
 		// 设置当前请求已被访问
-		c.StoreVisited(r)
+		c.StoreVisited(req)
 
-		body, err := r.Task.Fetcher.Get(r)
+		body, err := req.Task.Fetcher.Get(req)
 		if len(body) < 6000 {
 			c.Logger.Error("can't fetch ",
 				zap.Int("length", len(body)),
-				zap.String("url", r.Url),
+				zap.String("url", req.Url),
 			)
-			c.SetFailure(r)
+			c.SetFailure(req)
 			continue
 		}
 		if err != nil {
 			c.Logger.Error("can't fetch ",
 				zap.Error(err),
-				zap.String("url", r.Url),
+				zap.String("url", req.Url),
 			)
-			c.SetFailure(r)
+			c.SetFailure(req)
 			continue
 		}
-		result := r.ParseFunc(body, r)
+		rule := req.Task.Rule.Trunk[req.RuleName]
+
+		result := rule.ParseFunc(&collect.Context{
+			Body: body,
+			Req: req,
+		})
 
 		if len(result.Requests) > 0 {
 			go c.scheduler.Push(result.Requests...)

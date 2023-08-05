@@ -2,8 +2,29 @@ package engine
 
 import (
 	"github.com/xjh-creator/reptile/internal/collect"
+	"github.com/xjh-creator/reptile/internal/parse/doubangroup"
 	"go.uber.org/zap"
 )
+
+func init() {
+	Store.Add(doubangroup.Task)
+}
+
+func (c *CrawlerStore) Add(task *collect.Task) {
+	c.hash[task.Name] = task
+	c.list = append(c.list, task)
+}
+
+// Store 全局蜘蛛种类实例
+var Store = &CrawlerStore{
+	list: []*collect.Task{},
+	hash: map[string]*collect.Task{},
+}
+
+type CrawlerStore struct {
+	list []*collect.Task
+	hash map[string]*collect.Task
+}
 
 type Scheduler interface {
 	Schedule() // Schedule 方法负责启动调度器
