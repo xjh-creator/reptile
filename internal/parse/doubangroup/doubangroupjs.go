@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var DoubangroupJSTask = &collect.TaskModle{
+var DoubangroupJSTask = &collect.TaskModel{
 	Property: collect.Property{
 		Name:     "js_find_dou_ban_sun_room",
 		WaitTime: 1 * time.Second,
@@ -26,7 +26,7 @@ var DoubangroupJSTask = &collect.TaskModle{
 		console.log(arr[0].Url);
 		AddJsReq(arr);
 			`,
-	Rules: []collect.RuleModle{
+	Rules: []collect.RuleModel{
 		{
 			Name: "解析网站URL",
 			ParseFunc: `

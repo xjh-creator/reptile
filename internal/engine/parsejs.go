@@ -5,11 +5,6 @@ import (
 	"github.com/xjh-creator/reptile/internal/collect"
 )
 
-type mystruct struct {
-	Name string
-	Age  int
-}
-
 // 用于动态规则添加请求。
 func AddJsReqs(jreqs []map[string]interface{}) []*collect.Request {
 	reqs := make([]*collect.Request, 0)
@@ -45,7 +40,7 @@ func AddJsReq(jreq map[string]interface{}) []*collect.Request {
 	return reqs
 }
 
-func (c *CrawlerStore) AddJSTask(m *collect.TaskModle) {
+func (c *CrawlerStore) AddJSTask(m *collect.TaskModel) {
 	task := &collect.Task{
 		Property: m.Property,
 	}

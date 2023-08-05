@@ -1,12 +1,13 @@
 package collect
 
+// 构建动态规则模型 TaskModel
 type (
-	TaskModle struct {
+	TaskModel struct {
 		Property
 		Root  string      `json:"root_script"`
-		Rules []RuleModle `json:"rule"`
+		Rules []RuleModel `json:"rule"`
 	}
-	RuleModle struct {
+	RuleModel struct {
 		Name      string `json:"name"`
 		ParseFunc string `json:"parse_script"`
 	}

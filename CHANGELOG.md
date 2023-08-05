@@ -2,6 +2,12 @@
 1. 动态规则引擎
 2. 实现动态规则的引擎，可 Javascript 虚拟机，因为使用 JS 操作网页有天然的优势
 3. otto 是用 Go 编写的 JavaScript 虚拟机 https://github.com/robertkrimen/otto
+### 步骤
+1. 构建动态规则模型 TaskModle
+2. 书写动态爬虫规则
+3. 书写动态规则中的 Go 函数
+4. 初始化任务与规则
+5. 启动并加载任务
 
 ## feat:design task and rules
 1. 一个爬虫任务会针对不同的网站有不同的处理规则，但现在的处理方式导致多个规则之间是割裂的，不便于统一管理。
