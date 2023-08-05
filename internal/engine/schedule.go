@@ -43,7 +43,13 @@ func (s *Schedule) Run() {
 
 // Schedule 创建调度程序，负责的是调度的核心逻辑。
 func (s *Schedule) Schedule() {
-	var reqQueue = s.Seeds
+	var reqQueue []*collect.Request
+	for _, seed := range s.Seeds {
+		seed.RootReq.Task = seed
+		seed.RootReq.Url = seed.Url
+		reqQueue = append(reqQueue, seed.RootReq)
+	}
+
 	go func() {
 		for {
 			var req *collect.Request

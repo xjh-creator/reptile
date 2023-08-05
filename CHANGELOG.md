@@ -1,3 +1,10 @@
+## refactor:add task by refactoring request
+1. 之前的 Request 结构体会在每一次请求时发生变化，现在需要一个字段能够表示一整个网站的爬取任务
+2. 抽离出一个新的结构 Task 作为一个爬虫任务，而 Request 则作为单独的请求存在。
+
+## feat:add max depth limit
+1. 设置爬虫的最大深度
+
 ## feat:add max depth limit
 1. 设置爬虫的最大深度
 
