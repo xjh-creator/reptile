@@ -5,114 +5,63 @@ import (
 	"go.uber.org/zap"
 )
 
-type Schedule struct {
-	options
-
-	requestCh chan *collect.Request // requestCh 负责接收请求，并将请求存储到 reqQueue 队列中
-	workerCh  chan *collect.Request // workerCh 通道负责传送任务，负责分配任务给 worker
-	out       chan collect.ParseResult // out 负责处理爬取后的数据，
+type Scheduler interface {
+	Schedule() // Schedule 方法负责启动调度器
+	Push(...*collect.Request) // Push 方法会将请求放入到调度器中
+	Pull() *collect.Request // Pull 方法则会从调度器中获取请求
 }
 
-func NewSchedule(opts ...Option) *Schedule {
-	options := defaultOptions
-	for _, opt := range opts {
-		opt(&options)
-	}
+type Schedule struct {
+	requestCh chan *collect.Request
+	workerCh  chan *collect.Request
+	reqQueue  []*collect.Request
+	Logger    *zap.Logger
+}
+
+func NewSchedule() *Schedule {
 	s := &Schedule{}
-	s.options = options
+	requestCh := make(chan *collect.Request)
+	workerCh := make(chan *collect.Request)
+	s.requestCh = requestCh
+	s.workerCh = workerCh
 
 	return s
 }
 
-// Run 初始化三个通道，并完成下一步的存储操作
-func (s *Schedule) Run() {
-	requestCh := make(chan *collect.Request)
-	workerCh := make(chan *collect.Request)
-	out := make(chan collect.ParseResult)
-	s.requestCh = requestCh
-	s.workerCh = workerCh
-	s.out = out
-	go s.Schedule()
-
-	for i := 0; i < s.WorkCount; i++ {
-		go s.CreateWork()
+func (s *Schedule) Push(reqs ...*collect.Request) {
+	for _, req := range reqs {
+		s.requestCh <- req
 	}
+}
 
-	s.HandleResult()
+func (s *Schedule) Pull() *collect.Request {
+	r := <-s.workerCh
+	return r
+}
+
+func (s *Schedule) Output() *collect.Request {
+	r := <-s.workerCh
+	return r
 }
 
 // Schedule 创建调度程序，负责的是调度的核心逻辑。
 func (s *Schedule) Schedule() {
-	var reqQueue []*collect.Request
-	for _, seed := range s.Seeds {
-		seed.RootReq.Task = seed
-		seed.RootReq.Url = seed.Url
-		reqQueue = append(reqQueue, seed.RootReq)
-	}
-
-	go func() {
-		for {
-			var req *collect.Request
-			var ch chan *collect.Request
-
-			if len(reqQueue) > 0 {
-				req = reqQueue[0]
-				reqQueue = reqQueue[1:]
-				ch = s.workerCh
-			}
-			select {
-			case r := <-s.requestCh:
-				reqQueue = append(reqQueue, r)
-
-			case ch <- req:
-			}
-		}
-	}()
-}
-
-func (s *Schedule) CreateWork() {
 	for {
-		r := <-s.workerCh
-		if err := r.Check(); err != nil {
-			s.Logger.Error("check failed",
-				zap.Error(err),
-			)
-			continue
-		}
+		var req *collect.Request
+		var ch chan *collect.Request
 
-		body, err := s.Fetcher.Get(r)
-		if len(body) < 6000 {
-			s.Logger.Error("can't fetch ",
-				zap.Int("length", len(body)),
-				zap.String("url", r.Url),
-			)
-			continue
+		if len(s.reqQueue) > 0 {
+			req = s.reqQueue[0]
+			s.reqQueue = s.reqQueue[1:]
+			ch = s.workerCh
 		}
-		if err != nil {
-			s.Logger.Error("can't fetch ",
-				zap.Error(err),
-				zap.String("url", r.Url),
-			)
-			continue
-		}
-
-		result := r.ParseFunc(body, r)
-		s.out <- result
-	}
-}
-
-// HandleResult 处理爬取并解析后的数据结构
-func (s *Schedule) HandleResult() {
-	for {
 		select {
-		case result := <-s.out:
-			for _, req := range result.Requests {
-				s.requestCh <- req
-			}
-			for _, item := range result.Items {
-				// todo: store
-				s.Logger.Sugar().Info("get result: ", item)
-			}
+		case r := <-s.requestCh:
+			s.reqQueue = append(s.reqQueue, r)
+
+		case ch <- req:
+
 		}
 	}
 }
+

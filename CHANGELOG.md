@@ -1,3 +1,6 @@
+## feat:add hash to keep unique request
+1. 构建一个新的结构 Crawler 作为全局的爬取实例，将之前 Schedule 中的 options 迁移到 Crawler 中，Schedule 只处理与调度有关的工作，并抽象为了 Scheduler 接口 
+
 ## refactor:add task by refactoring request
 1. 之前的 Request 结构体会在每一次请求时发生变化，现在需要一个字段能够表示一整个网站的爬取任务
 2. 抽离出一个新的结构 Task 作为一个爬虫任务，而 Request 则作为单独的请求存在。
