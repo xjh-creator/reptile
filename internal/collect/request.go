@@ -31,6 +31,7 @@ type Request struct {
 	Method    string
 	Url       string
 	Depth     int
+	Priority  int
 	ParseFunc func([]byte, *Request) ParseResult
 }
 

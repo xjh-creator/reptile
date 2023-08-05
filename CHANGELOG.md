@@ -1,3 +1,6 @@
+## feat:add priority setting in request
+1. 爬虫任务的优先级有时并不是相同的，一些任务需要优先处理
+
 ## feat:add hash to keep unique request
 1. 构建一个新的结构 Crawler 作为全局的爬取实例，将之前 Schedule 中的 options 迁移到 Crawler 中，Schedule 只处理与调度有关的工作，并抽象为了 Scheduler 接口 
 
