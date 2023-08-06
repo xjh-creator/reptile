@@ -2,13 +2,16 @@ package engine
 
 import (
 	"github.com/xjh-creator/reptile/internal/collect"
+	"github.com/xjh-creator/reptile/internal/parse/doubanbook"
 	"github.com/xjh-creator/reptile/internal/parse/doubangroup"
+	"github.com/xjh-creator/reptile/internal/parse/doubangroupjs"
 	"go.uber.org/zap"
 )
 
 func init() {
 	Store.Add(doubangroup.Task)
-	Store.AddJSTask(doubangroup.DoubangroupJSTask)
+	Store.Add(doubanbook.DoubanBookTask)
+	Store.AddJSTask(doubangroupjs.DoubangroupJSTask)
 }
 
 func (c *CrawlerStore) Add(task *collect.Task) {
@@ -16,7 +19,7 @@ func (c *CrawlerStore) Add(task *collect.Task) {
 	c.list = append(c.list, task)
 }
 
-// Store 全局蜘蛛种类实例
+// Store 全局爬虫任务实例
 var Store = &CrawlerStore{
 	list: []*collect.Task{},
 	hash: map[string]*collect.Task{},
@@ -58,11 +61,6 @@ func (s *Schedule) Push(reqs ...*collect.Request) {
 }
 
 func (s *Schedule) Pull() *collect.Request {
-	r := <-s.workerCh
-	return r
-}
-
-func (s *Schedule) Output() *collect.Request {
 	r := <-s.workerCh
 	return r
 }

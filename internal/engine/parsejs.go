@@ -82,7 +82,7 @@ func (c *CrawlerStore) AddJSTask(m *collect.TaskModel) {
 			task.Rule.Trunk = make(map[string]*collect.Rule, 0)
 		}
 		task.Rule.Trunk[r.Name] = &collect.Rule{
-			paesrFunc,
+			ParseFunc: paesrFunc,
 		}
 	}
 
